@@ -7,7 +7,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "stb_image.h"
-#include "Shader.h"
+#include "Shader.hpp"
+#include "Camera.hpp"
 
 const char* vertexShaderPath = "resources/shaders/vertex.glsl";
 const char* fragmentShaderPath = "resources/shaders/fragment.glsl";
@@ -16,10 +17,16 @@ const unsigned int WIDTH = 1920;
 const unsigned int HEIGHT = 1920;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xPos, double yPos);
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
-float mixAmount = 0.5;
-float aspect_ratio = 9.0f / 16.0f;
+float mixAmount = 0.5f;
+float deltaTime, lastFrame = 0.0f;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f), 45.0f);
+float lastX = (float)WIDTH / 2.0f, lastY = (float)HEIGHT / 2.0f;
+bool firstMouse = true;
 
 int main(void)
 {
@@ -39,6 +46,9 @@ int main(void)
 
     // Sets the viewport size on the window that OpenGL will render to.
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -195,6 +205,10 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         processInput(window);
 
         // Rendering
@@ -209,14 +223,13 @@ int main(void)
         unsigned int uniformLocation = glGetUniformLocation(shaderProgram.ID, "mixAmount");
         glUniform1f(uniformLocation, mixAmount);
 
-        glm::mat4 model, view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        glm::mat4 view = camera.getView();
         shaderProgram.setMat4("view", glm::value_ptr(view));
 
-        glm::mat4 projection = glm::perspective(glm::radians(60.0f),
-            aspect_ratio, 0.1f, 100.0f);
+        glm::mat4 projection = camera.getProjection(WIDTH, HEIGHT);
         shaderProgram.setMat4("projection", glm::value_ptr(projection));
 
+        glm::mat4 model = glm::mat4(1.0f);
         // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBindVertexArray(VAO);
         for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(glm::vec3); i++)
@@ -251,16 +264,52 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
+{
+    float xPos = static_cast<float>(xPosIn);
+    float yPos = static_cast<float>(yPosIn);
+    
+    if (firstMouse)
+    {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
+    
+    float xOffset = xPos - lastX;
+    float yOffset = yPos - lastY;
+
+    lastX = xPos;
+    lastY = yPos;
+
+    camera.processMouseMovement(xOffset, yOffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    camera.processMouseScroll(static_cast<float>(yOffset));
+}
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    float mixChange = 0.25f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        mixAmount = fminf(mixAmount + 0.0005f, 1.0f);
+        mixAmount = fminf(mixAmount + mixChange, 1.0f);
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        mixAmount = fmaxf(mixAmount - 0.0005f, 0.0f);
+        mixAmount = fmaxf(mixAmount - mixChange, 0.0f);
+
+    const float cameraSpeed = 2.5f * deltaTime;
+    glm::vec3 right = camera.getCameraRight();
+    glm::vec3 forward = camera.getCameraForward();
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        aspect_ratio += 0.0005f;
+        camera.cameraPos += cameraSpeed * forward;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        aspect_ratio -= 0.0005f;
+        camera.cameraPos -= cameraSpeed * forward;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.cameraPos -= cameraSpeed * right;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.cameraPos += cameraSpeed * right;
 }
