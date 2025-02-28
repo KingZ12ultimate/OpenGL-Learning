@@ -90,7 +90,14 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)Dependencies\Libs\assimp-vc143-mtd.dll" "$(TargetDir)" /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -107,7 +114,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)Dependencies\Libs\assimp-vc143-mtd.dll" "$(TargetDir)" /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -121,8 +135,14 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)Dependencies\Libs\assimp-vc143-mtd.dll" "$(TargetDir)" /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -139,8 +159,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)Dependencies\Libs\assimp-vc143-mtd.dll" "$(TargetDir)" /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -149,11 +175,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.hpp" />
+    <ClInclude Include="src\Light.hpp" />
+    <ClInclude Include="src\Mesh.hpp" />
+    <ClInclude Include="src\Model.hpp" />
     <ClInclude Include="src\Shader.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\fragment.glsl" />
+    <None Include="resources\shaders\fragment_test.glsl" />
     <None Include="resources\shaders\vertex.glsl" />
+    <None Include="resources\shaders\vertex_test.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

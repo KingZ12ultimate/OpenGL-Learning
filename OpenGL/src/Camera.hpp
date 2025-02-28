@@ -2,18 +2,17 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
 
 class Camera
 {
 public:
 	float fov = 45.0f;
-	glm::vec3 cameraPos = glm::vec3(0.0f);
+	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 eulerAngles = glm::vec3(0.0f);
 	glm::mat4 view, projection;
 
 	Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov);
-	~Camera();
 
 	glm::vec3 getCameraForward();
 	glm::vec3 getCameraUp();
@@ -22,21 +21,23 @@ public:
 	glm::mat4 getView();
 	glm::mat4 getProjection(unsigned int width, unsigned int height);
 
+	void processKeyPresses(GLFWwindow* window, float deltaTime);
 	void processMouseMovement(float xOffset, float yOffset);
 	void processMouseScroll(float yOffset);
 
 private:
 	float minFov = 1.0f;
 	float maxFov = 60.0f;
-	float minPitch = -15.0f;
-	float maxPitch = 75.0f;
+	float minPitch = -89.0f;
+	float maxPitch = 89.0f;
 	float sensitivity = 0.1f;
+	const float speed = 2.5f;
 	glm::quat getQuat();
 };
 
 Camera::Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov)
 {
-	this->cameraPos = cameraPos;
+	this->position = cameraPos;
 
 	if (eulerAngles.x > this->maxPitch)
 		eulerAngles.x = this->maxPitch;
@@ -50,10 +51,6 @@ Camera::Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov)
 	else if (fov < this->minFov)
 		fov = this->minFov;
 	this->fov = fov;
-}
-
-Camera::~Camera()
-{
 }
 
 glm::vec3 Camera::getCameraForward()
@@ -73,7 +70,7 @@ glm::vec3 Camera::getCameraRight()
 
 glm::mat4 Camera::getView()
 {
-	return glm::lookAt(cameraPos, cameraPos + getCameraForward(), getCameraUp());
+	return glm::lookAt(position, position + getCameraForward(), getCameraUp());
 }
 
 glm::mat4 Camera::getProjection(unsigned int width, unsigned int height)
@@ -88,6 +85,26 @@ glm::quat Camera::getQuat()
 	float yaw = glm::radians(eulerAngles.y);
 	float roll = glm::radians(eulerAngles.z);
 	return glm::quat(glm::vec3(pitch, yaw, roll));
+}
+
+void Camera::processKeyPresses(GLFWwindow* window, float deltaTime)
+{
+	float delta = speed * deltaTime;
+	glm::vec3 right = getCameraRight();
+	glm::vec3 forward = getCameraForward();
+	glm::vec3 up = glm::cross(right, forward);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		position += delta * forward;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		position -= delta * forward;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		position -= delta * right;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		position += delta * right;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		position += delta * up;
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		position -= delta * up;
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset)

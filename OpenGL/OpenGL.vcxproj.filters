@@ -32,9 +32,20 @@
     <ClInclude Include="src\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Light.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\fragment.glsl" />
     <None Include="resources\shaders\vertex.glsl" />
+    <None Include="resources\shaders\fragment_test.glsl" />
+    <None Include="resources\shaders\vertex_test.glsl" />
   </ItemGroup>
 </Project>
