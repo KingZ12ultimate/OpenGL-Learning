@@ -75,7 +75,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+# *.obj
 *.iobj
 *.pch
 *.pdb
@@ -363,4 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # 3d Models
-!OpenGL/resources/models/*.obj
+# !OpenGL/resources/models/*.obj
