@@ -363,4 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # 3d Models
-!models/*.obj
+!OpenGL/resources/models/*.obj
