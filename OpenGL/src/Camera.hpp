@@ -12,7 +12,7 @@ public:
 	glm::vec3 eulerAngles = glm::vec3(0.0f);
 	glm::mat4 view, projection;
 
-	Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov);
+	Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov, float near, float far);
 
 	glm::vec3 getCameraForward();
 	glm::vec3 getCameraUp();
@@ -31,11 +31,13 @@ private:
 	float minPitch = -89.0f;
 	float maxPitch = 89.0f;
 	float sensitivity = 0.1f;
+	float near = 0.1f;
+	float far = 1000.0f;
 	const float speed = 2.5f;
 	glm::quat getQuat();
 };
 
-Camera::Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov)
+Camera::Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov, float near, float far)
 {
 	this->position = cameraPos;
 
@@ -51,6 +53,9 @@ Camera::Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov)
 	else if (fov < this->minFov)
 		fov = this->minFov;
 	this->fov = fov;
+
+	this->near = near;
+	this->far = far;
 }
 
 glm::vec3 Camera::getCameraForward()
@@ -76,7 +81,7 @@ glm::mat4 Camera::getView()
 glm::mat4 Camera::getProjection(unsigned int width, unsigned int height)
 {
 	return glm::perspective(glm::radians(fov),
-		(float)height / (float)width, 0.1f, 100.0f);;
+		(float)height / (float)width, near, far);
 }
 
 glm::quat Camera::getQuat()

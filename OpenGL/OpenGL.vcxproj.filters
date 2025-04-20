@@ -24,6 +24,9 @@
     <ClCompile Include="src\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.hpp">
@@ -47,5 +50,12 @@
     <None Include="resources\shaders\vertex.glsl" />
     <None Include="resources\shaders\fragment_test.glsl" />
     <None Include="resources\shaders\vertex_test.glsl" />
+    <None Include="resources\shaders\fragment_blend.glsl" />
+    <None Include="resources\shaders\vertex_quad.glsl" />
+    <None Include="resources\shaders\fragment_quad.glsl" />
+    <None Include="resources\shaders\vertex_skybox.glsl" />
+    <None Include="resources\shaders\fragment_skybox.glsl" />
+    <None Include="resources\shaders\fragment_container.glsl" />
+    <None Include="resources\shaders\vertex_container.glsl" />
   </ItemGroup>
 </Project>

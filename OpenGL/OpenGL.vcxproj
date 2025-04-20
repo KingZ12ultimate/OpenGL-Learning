@@ -172,6 +172,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.hpp" />
@@ -182,8 +183,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\fragment.glsl" />
+    <None Include="resources\shaders\fragment_container.glsl" />
+    <None Include="resources\shaders\fragment_quad.glsl" />
+    <None Include="resources\shaders\fragment_skybox.glsl" />
     <None Include="resources\shaders\fragment_test.glsl" />
+    <None Include="resources\shaders\fragment_blend.glsl" />
     <None Include="resources\shaders\vertex.glsl" />
+    <None Include="resources\shaders\vertex_container.glsl" />
+    <None Include="resources\shaders\vertex_quad.glsl" />
+    <None Include="resources\shaders\vertex_skybox.glsl" />
     <None Include="resources\shaders\vertex_test.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
