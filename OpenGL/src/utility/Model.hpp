@@ -32,6 +32,16 @@ public:
 			meshes[i].Draw(shader);
 		}
 	}
+
+	std::vector<Mesh>& getMeshes()
+	{
+		return meshes;
+	}
+
+	std::vector<Texture>& getTextures()
+	{
+		return textures_loaded;
+	}
 private:
 	// model data
 	std::vector<Mesh> meshes;
@@ -126,6 +136,7 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 	{
 		std::vector<Texture> textures;
+		auto a = mat->GetTextureCount(type);
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
 			aiString str;

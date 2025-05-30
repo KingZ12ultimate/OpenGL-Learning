@@ -18,10 +18,10 @@
     <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\glad.c">
+    <ClCompile Include="src\utility\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stb_image.cpp">
+    <ClCompile Include="src\utility\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Test.cpp">
@@ -29,19 +29,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Shader.hpp">
+    <ClInclude Include="src\utility\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Camera.hpp">
+    <ClInclude Include="src\utility\Light.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Light.hpp">
+    <ClInclude Include="src\utility\Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh.hpp">
+    <ClInclude Include="src\utility\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model.hpp">
+    <ClInclude Include="src\utility\Shader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,5 +57,7 @@
     <None Include="resources\shaders\fragment_skybox.glsl" />
     <None Include="resources\shaders\fragment_container.glsl" />
     <None Include="resources\shaders\vertex_container.glsl" />
+    <None Include="resources\shaders\fragment_rock.glsl" />
+    <None Include="resources\shaders\vertex_rock.glsl" />
   </ItemGroup>
 </Project>

@@ -8,9 +8,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Model.hpp"
-#include "Shader.hpp"
-#include "Camera.hpp"
+#include "utility/Model.hpp"
+#include "utility/Shader.hpp"
+#include "utility/Camera.hpp"
 #include "stb_image.h"
 
 #ifdef __cplusplus
@@ -43,7 +43,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f), 45.0f, near, far);
 float lastX = (float)WIDTH / 2.0f, lastY = (float)HEIGHT / 2.0f;
 bool firstMouse = true;
 
-int main(void)
+int main1(void)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
