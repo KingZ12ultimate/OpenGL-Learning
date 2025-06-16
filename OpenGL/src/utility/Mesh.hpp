@@ -10,6 +10,7 @@ struct Vertex
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;
+	glm::vec3 Tangent;
 };
 
 struct Texture
@@ -39,16 +40,18 @@ public:
 
 	void Draw(Shader& shader)
 	{
-		unsigned int diffuseNum = 0, specularNum = 0;
+		unsigned int diffuseNum = 0, specularNum = 0, normalNum = 0;
 		for (unsigned int i = 0; i < textures.size(); i++)
 		{
 			glActiveTexture(GL_TEXTURE0 + i);
 			std::string number;
 			std::string name = textures[i].type;
-			if (name == "diffuse_texture")
+			if (name == "texture_diffuse")
 				number = std::to_string(diffuseNum++);
-			else if (name == "specular_texture")
+			else if (name == "texture_specular")
 				number = std::to_string(specularNum++);
+			else if (name == "texture_normal")
+				number = std::to_string(normalNum++);
 
 			shader.setInt("material." + name + "[" + number + "]", i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
@@ -97,6 +100,10 @@ private:
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 
-		// glBindVertexArray(0);
+		// vertex tangents
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+
+		glBindVertexArray(0);
 	}
 };

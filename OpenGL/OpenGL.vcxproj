@@ -170,7 +170,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Test.cpp" />
     <ClCompile Include="src\utility\glad.c" />
     <ClCompile Include="src\utility\stb_image.cpp" />
   </ItemGroup>
@@ -182,19 +181,31 @@
     <ClInclude Include="src\utility\Shader.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\fragment.glsl" />
-    <None Include="resources\shaders\fragment_container.glsl" />
-    <None Include="resources\shaders\fragment_quad.glsl" />
-    <None Include="resources\shaders\fragment_rock.glsl" />
-    <None Include="resources\shaders\fragment_skybox.glsl" />
-    <None Include="resources\shaders\fragment_test.glsl" />
-    <None Include="resources\shaders\fragment_blend.glsl" />
-    <None Include="resources\shaders\vertex.glsl" />
-    <None Include="resources\shaders\vertex_container.glsl" />
-    <None Include="resources\shaders\vertex_quad.glsl" />
-    <None Include="resources\shaders\vertex_rock.glsl" />
-    <None Include="resources\shaders\vertex_skybox.glsl" />
-    <None Include="resources\shaders\vertex_test.glsl" />
+    <None Include="resources\shaders\normal_mapping.frag" />
+    <None Include="resources\shaders\normal_mapping.vert" />
+    <None Include="resources\shaders\phong.frag" />
+    <None Include="resources\shaders\blinn_phong.frag" />
+    <None Include="resources\shaders\container.frag" />
+    <None Include="resources\shaders\depth_shadows.frag" />
+    <None Include="resources\shaders\point_shadows.frag" />
+    <None Include="resources\shaders\point_shadows.vert" />
+    <None Include="resources\shaders\point_shadows_depth.frag" />
+    <None Include="resources\shaders\point_shadows_depth.geom" />
+    <None Include="resources\shaders\quad.frag" />
+    <None Include="resources\shaders\simple_depth.frag" />
+    <None Include="resources\shaders\skybox.frag" />
+    <None Include="resources\shaders\base.frag" />
+    <None Include="resources\shaders\blend.frag" />
+    <None Include="resources\shaders\point_shadows_depth.vert" />
+    <None Include="resources\shaders\phong.vert" />
+    <None Include="resources\shaders\blinn_phong.vert" />
+    <None Include="resources\shaders\container.vert" />
+    <None Include="resources\shaders\depth_shadows.vert" />
+    <None Include="resources\shaders\quad.vert" />
+    <None Include="resources\shaders\rock_instanced.vert" />
+    <None Include="resources\shaders\simple_depth.vert" />
+    <None Include="resources\shaders\skybox.vert" />
+    <None Include="resources\shaders\base.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

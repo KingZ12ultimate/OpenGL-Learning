@@ -51,7 +51,8 @@ private:
 	void loadModel(const std::string& path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs | 
+			aiProcess_CalcTangentSpace);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
@@ -99,6 +100,11 @@ private:
 			vector.z = mesh->mNormals[i].z;
 			vertex.Normal = vector;
 
+			vector.x = mesh->mTangents[i].x;
+			vector.y = mesh->mTangents[i].y;
+			vector.z = mesh->mTangents[i].z;
+			vertex.Tangent = vector;
+
 			if (mesh->mTextureCoords[0]) // does the mesh have texture coordinates?
 			{
 				glm::vec2 vec;
@@ -124,10 +130,12 @@ private:
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-			std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse_texture");
+			std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-			std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular_texture");
+			std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+			std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 		}
 
 		return Mesh(vertices, indices, textures);
@@ -154,7 +162,7 @@ private:
 			if (!skip)
 			{ // if texture hasn't been loaded already, load it
 				Texture texture;
-				texture.id = TextureFromFile(str.C_Str(), directory);
+				texture.id = TextureFromFile(str.C_Str(), directory, type == aiTextureType_DIFFUSE ? true : false);
 				texture.type = typeName;
 				texture.path = str.C_Str();
 				textures.push_back(texture);
@@ -178,22 +186,25 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 
 	if (data)
 	{
-		GLenum format;
+		GLenum format = 0, internalFormat = 0;
 		switch (numChannels)
 		{
 		case 1:
 			format = GL_RED;
+			internalFormat = GL_RED;
 			break;
 		case 3:
 			format = GL_RGB;
+			internalFormat = gamma ? GL_SRGB : GL_RGB;
 			break;
 		case 4:
 			format = GL_RGBA;
+			internalFormat = gamma ? GL_SRGB_ALPHA : GL_RGBA;
 			break;
 		}
 		
 		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -33,7 +33,7 @@ private:
 	float sensitivity = 0.1f;
 	float near = 0.1f;
 	float far = 1000.0f;
-	const float speed = 80.0f;
+	const float speed = 10.0f;
 	glm::quat getQuat();
 };
 
