@@ -30,9 +30,8 @@ bool bump = true;
 bool bumpKeyPressed = false;
 
 float near = 0.1f, far = 1000.0f;
-unsigned int cubeVBO, cubeVAO;
 
-void printVec(glm::vec3& v)
+void printVec(glm::vec3 v)
 {
     std::cout << "(" << v.x << ", " << v.y << ", " << v.z << ")" << std::endl;
 }
@@ -57,7 +56,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f), 45.0f, near, far);
 float lastX = (float)SCREEN_WIDTH / 2.0f, lastY = (float)SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 lightPos = glm::vec3(0.0f);
 
 bool debug = false;
 
@@ -67,7 +66,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
@@ -99,135 +98,21 @@ int main(void)
 
     stbi_set_flip_vertically_on_load(true);
 
-    // glEnable(GL_MULTISAMPLE);
+	glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    Shader gBufferShader("resources/shaders/deferred/geometry_pass.vert", "resources/shaders/deferred/geometry_pass.frag");
-    Shader lightingPassShader("resources/shaders/base/quad.vert", "resources/shaders/deferred/lighting_pass.frag");
-    Shader lightCubeShader("resources/shaders/instancing/light_cube_instanced.vert", "resources/shaders/instancing/light_cube_instanced.frag");
-    Shader skyboxShader("resources/shaders/skybox/skybox.vert", "resources/shaders/skybox/skybox.frag");
+    Shader baseShader("resources/shaders/base.vert", "resources/shaders/base.frag");
+    Shader parallaxShader("resources/shaders/parallax_mapping.vert", "resources/shaders/parallax_mapping.frag");
+	Shader skyboxShader("resources/shaders/skybox.vert", "resources/shaders/skybox.frag");
 
     setupCube();
     setupPlane();
 
-    Model backpack("resources/models/backpack/backpack.obj");
-
-    #pragma region Instancing data
-    int amount = 10;
-    float offset = 5.0f;
-    glm::mat4* modelMatrices = new glm::mat4[amount * amount];
-    for (int i = 0; i < amount; i++)
-    {
-        float z = (i + 0.5f - 0.5f * amount) * offset;
-        for (int j = 0; j < amount; j++)
-        {
-            float x = (j + 0.5f - 0.5f * amount) * offset;
-            glm::vec3 pos = glm::vec3(x, 0.0f, z);
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, pos);
-            modelMatrices[i * amount + j] = model;
-        }
-    }
-
-    unsigned int modelMatricesBuffer;
-    glGenBuffers(1, &modelMatricesBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
-    glBufferData(GL_ARRAY_BUFFER, amount * amount * sizeof(glm::mat4), modelMatrices, GL_STATIC_DRAW);
-
-    std::vector<Mesh> meshes = backpack.getMeshes();
-    for (int i = 0; i < meshes.size(); i++)
-    {
-        unsigned int VAO = meshes[i].VAO;
-        glBindVertexArray(VAO);
-        std::size_t vec4Size = sizeof(glm::vec4);
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)vec4Size);
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
-
-        glVertexAttribDivisor(3, 1);
-        glVertexAttribDivisor(4, 1);
-        glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
-
-        glBindVertexArray(0);
-    }
-    #pragma endregion
-
-    #pragma region Lights
-    struct Light {
-        glm::mat4 world;
-        glm::vec3 color;
-    };
-
-    int numLights = 8;
-    offset = 6.0f;
-    float y = 3.5f;
-    lightingPassShader.use();
-    srand(static_cast<unsigned int>(glfwGetTime()));
-    Light* lights = new Light[numLights * numLights];
-    for (int i = 0; i < numLights; i++)
-    {
-        float z = (i + 0.5f - 0.5f * numLights) * offset;
-        for (int j = 0; j < numLights; j++)
-        {
-            float x = (j + 0.5f - 0.5f * numLights) * offset;
-            glm::vec3 pos = glm::vec3(x, y, z);
-            
-            float r = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // random between 0.5 and 1.0
-            float g = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // random between 0.5 and 1.0
-            float b = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // random between 0.5 and 1.0
-            glm::vec3 color = glm::vec3(r, g, b);
-            lights[i * numLights + j].color = color;
-
-            lightingPassShader.setVec3("lights[" + std::to_string(i * numLights + j) + "].position", pos);
-            lightingPassShader.setVec3("lights[" + std::to_string(i * numLights + j) + "].color", color);
-
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, pos);
-            model = glm::scale(model, glm::vec3(0.1f));
-            lights[i * numLights + j].world = model;
-        }
-    }
-    lightingPassShader.setInt("gPosition", 0);
-    lightingPassShader.setInt("gNormal", 1);
-    lightingPassShader.setInt("gAlbedoSpec", 2);
-
-    unsigned int lightDataBuffer;
-    glGenBuffers(1, &lightDataBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, lightDataBuffer);
-    glBufferData(GL_ARRAY_BUFFER, numLights * numLights * sizeof(Light), lights, GL_STATIC_DRAW);
-
-    glBindVertexArray(cubeVAO);
-    std::size_t vec4Size = sizeof(glm::vec4);
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Light), (void*)0);
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Light), (void*)vec4Size);
-    glEnableVertexAttribArray(5);
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Light), (void*)(2 * vec4Size));
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Light), (void*)(3 * vec4Size));
-    glEnableVertexAttribArray(7);
-    glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(Light), (void*)(4 * vec4Size));
-
-    glVertexAttribDivisor(3, 1);
-    glVertexAttribDivisor(4, 1);
-    glVertexAttribDivisor(5, 1);
-    glVertexAttribDivisor(6, 1);
-    glVertexAttribDivisor(7, 1);
-
-    glBindVertexArray(0);
-    delete[] lights;
-    lights = nullptr;
-    #pragma endregion
-
-    #pragma region Skybox
+	unsigned int brickTexture = loadTexture("resources/textures/wood.png", true, true);
+    unsigned int brickNormalTexture = loadTexture("resources/textures/toy_box_normal.png", true);
+    unsigned int brickDispTexture = loadTexture("resources/textures/toy_box_disp.png", true);
+    
     std::string skyboxPath = "resources/textures/skyboxes/skybox_space/";
     std::vector<std::string> faces = {
         "right.png",
@@ -241,63 +126,23 @@ int main(void)
         faces[i] = skyboxPath + faces[i];
 
     unsigned int skyboxTexture = loadCubeMap(faces);
-    skyboxShader.use();
-    skyboxShader.setInt("skybox", 0);
-#pragma endregion
-
-    #pragma region Geometry Buffer
-    unsigned int gBuffer;
-    glGenFramebuffers(1, &gBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    unsigned int gPosition, gNormal, gColorSpec;
-    
-    // position buffer
-    glGenTextures(1, &gPosition);
-    glBindTexture(GL_TEXTURE_2D, gPosition);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
-    
-    // normal buffer
-    glGenTextures(1, &gNormal);
-    glBindTexture(GL_TEXTURE_2D, gNormal);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
-    
-    // albedo-spec buffer
-    glGenTextures(1, &gColorSpec);
-    glBindTexture(GL_TEXTURE_2D, gColorSpec);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gColorSpec, 0);
-
-    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, attachments);
-
-    // depth buffer
-    unsigned int depthRBO;
-    glGenRenderbuffers(1, &depthRBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, SCREEN_WIDTH, SCREEN_HEIGHT);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "Framebuffer not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    #pragma endregion
 
     unsigned int uboMatrices;
-    glGenBuffers(1, &uboMatrices);
-    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	glGenBuffers(1, &uboMatrices);
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
+	
+    baseShader.use();
+    baseShader.setBool("white", 1);
+    parallaxShader.use();
+    parallaxShader.setInt("diffuseTexture", 0);
+    parallaxShader.setInt("normalMap", 1);
+    parallaxShader.setInt("depthMap", 2);
+    skyboxShader.use();
+	skyboxShader.setInt("skybox", 0);
 
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -307,43 +152,47 @@ int main(void)
         processInput(window);
 
 #pragma region draw scene
-        // first pass (geometry pass)
-        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        glDepthFunc(GL_LESS);
 
-        glm::mat4 projection = camera.getProjection(SCREEN_WIDTH, SCREEN_HEIGHT);
-        glm::mat4 view = camera.getView();
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+		glm::mat4 projection = camera.getProjection(SCREEN_WIDTH, SCREEN_HEIGHT);
+		glm::mat4 view = camera.getView();
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-        
-        gBufferShader.use();
-        backpack.DrawInstanced(gBufferShader, amount * amount);
 
-        // second pass (lighting pass)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        float radius = 3.0f;
+        float speed = 1.0f;
+        lightPos.x = radius * cosf(speed * currentFrame);
+        lightPos.z = radius * sinf(speed * currentFrame);
+
+        parallaxShader.use();
+        parallaxShader.setVec3("lightPos", lightPos);
+        parallaxShader.setVec3("viewPos", camera.position);
+        parallaxShader.setFloat("heightScale", 0.25f);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glBindTexture(GL_TEXTURE_2D, brickTexture);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glBindTexture(GL_TEXTURE_2D, brickNormalTexture);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, gColorSpec);
-        lightingPassShader.use();
-        lightingPassShader.setVec3("viewPos", camera.position);
-        renderQuad();
+        glBindTexture(GL_TEXTURE_2D, brickDispTexture);
+        renderScene(parallaxShader);
 
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        lightCubeShader.use();
-        lightCubeShader.setBool("white", true);
-        lightCubeShader.setVec3("color", glm::vec3(1.0f));
-        glBindVertexArray(cubeVAO);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, numLights* numLights);
-        glBindVertexArray(0);
+        // light cube
+        baseShader.use();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.05f));
+        baseShader.setMat4("model", model);
+        renderCube();
+
+        // skybox
+        skyboxShader.use();
+		view = glm::mat4(glm::mat3(view)); // remove translation from view matrix
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+        glDepthFunc(GL_LEQUAL);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+        renderSkybox();
 #pragma endregion
 
         glfwSwapBuffers(window);
@@ -398,7 +247,6 @@ void processInput(GLFWwindow* window)
     {
         bump = !bump;
         bumpKeyPressed = true;
-        std::cout << bump << std::endl;
     }
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
     {
@@ -408,7 +256,7 @@ void processInput(GLFWwindow* window)
 #pragma endregion
 
 #pragma region Rendering Functions
-/* Receives an array of vertex data in form:
+/* Receives an array of vertex data in form: 
     position - 3 floats,
     normal - 3 floats,
     texture coordinates - 2 floats,
@@ -416,7 +264,7 @@ void processInput(GLFWwindow* window)
    In addition, also calculates the tangents of the vertices.
    Note that the vertex data should contain 3 vertices for each triangle,
    including duplicates of the same vertices for different triangles.*/
-void setupMesh(float data[], int dataSize, unsigned int& VAO, unsigned int& VBO)
+void setupMesh(float data[], int dataSize, unsigned int &VAO, unsigned int &VBO)
 {
     std::vector<Vertex> vertices;
     for (int i = 0; i < dataSize / sizeof(float); i += 8)
@@ -470,6 +318,7 @@ void setupMesh(float data[], int dataSize, unsigned int& VAO, unsigned int& VBO)
     glBindVertexArray(0);
 }
 
+unsigned int cubeVBO, cubeVAO;
 void setupCube()
 {
     if (cubeVAO != 0)
@@ -637,35 +486,34 @@ void renderSkybox()
             -1.0f, -1.0f,  1.0f,
              1.0f, -1.0f,  1.0f
         };
-        glGenVertexArrays(1, &skyboxVAO);
-        glGenBuffers(1, &skyboxVBO);
-        glBindVertexArray(skyboxVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+		glGenVertexArrays(1, &skyboxVAO);
+		glGenBuffers(1, &skyboxVBO);
+		glBindVertexArray(skyboxVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glBindVertexArray(0);
     }
 
-    glBindVertexArray(skyboxVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
+	glBindVertexArray(skyboxVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 }
 
 void renderScene(const Shader& shader)
 {
     // floor
-    glm::mat4 model = glm::mat4(1.0f);
-    shader.setBool("white", 0);
-    shader.setMat4("model", model);
-    renderPlane();
+    /*glm::mat4 model = glm::mat4(1.0f);
+	shader.setMat4("model", model);
+    renderPlane();*/
     // cubes
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 3.0f, 1.0));
+    glm::mat4 model = glm::mat4(1.0f);
+    // model = glm::translate(model, glm::vec3(2.0f, 3.0f, 1.0));
     model = glm::scale(model, glm::vec3(0.75f));
     shader.setMat4("model", model);
     renderCube();
-    model = glm::mat4(1.0f);
+    /*model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(-1.5f, 1.0f, 1.5));
     model = glm::scale(model, glm::vec3(0.5f));
     shader.setMat4("model", model);
@@ -675,7 +523,7 @@ void renderScene(const Shader& shader)
     model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
     model = glm::scale(model, glm::vec3(0.75f));
     shader.setMat4("model", model);
-    renderCube();
+    renderCube();*/
 }
 #pragma endregion
 
@@ -759,7 +607,7 @@ unsigned int loadCubeMap(std::vector<std::string> faces)
                 format = GL_RGBA;
                 break;
             }
-
+                
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         }

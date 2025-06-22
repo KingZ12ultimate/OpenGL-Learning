@@ -40,25 +40,21 @@ public:
 
 	void Draw(Shader& shader)
 	{
-		unsigned int diffuseNum = 0, specularNum = 0, normalNum = 0;
-		for (unsigned int i = 0; i < textures.size(); i++)
-		{
-			glActiveTexture(GL_TEXTURE0 + i);
-			std::string number;
-			std::string name = textures[i].type;
-			if (name == "texture_diffuse")
-				number = std::to_string(diffuseNum++);
-			else if (name == "texture_specular")
-				number = std::to_string(specularNum++);
-			else if (name == "texture_normal")
-				number = std::to_string(normalNum++);
-
-			shader.setInt("material." + name + "[" + number + "]", i);
-			glBindTexture(GL_TEXTURE_2D, textures[i].id);
-		}
+		SetupTexturesForDraw(shader);
 		
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+
+		glActiveTexture(GL_TEXTURE0);
+	}
+
+	void DrawInstanced(Shader& shader, int amount)
+	{
+		SetupTexturesForDraw(shader);
+
+		glBindVertexArray(VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0, amount);
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -105,5 +101,25 @@ private:
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
 
 		glBindVertexArray(0);
+	}
+
+	void SetupTexturesForDraw(Shader& shader)
+	{
+		unsigned int diffuseNum = 0, specularNum = 0, normalNum = 0;
+		for (unsigned int i = 0; i < textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			std::string number;
+			std::string name = textures[i].type;
+			if (name == "texture_diffuse")
+				number = std::to_string(diffuseNum++);
+			else if (name == "texture_specular")
+				number = std::to_string(specularNum++);
+			else if (name == "texture_normal")
+				number = std::to_string(normalNum++);
+
+			shader.setInt("material." + name + "[" + number + "]", i);
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		}
 	}
 };

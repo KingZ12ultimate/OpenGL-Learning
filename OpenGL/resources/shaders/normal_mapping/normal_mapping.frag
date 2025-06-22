@@ -12,12 +12,12 @@ in VS_OUT {
 uniform sampler2D diffuseTexture;
 uniform sampler2D normal_texture;
 uniform vec3 lightPos;
+uniform vec3 lightColor;
 uniform bool white;
 
 void main()
 {
 	vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
-	vec3 lightColor = vec3(1.0);
 	vec3 ambient = 0.1 * lightColor;
 	
     vec3 normal = texture(normal_texture, fs_in.TexCoords).rgb;

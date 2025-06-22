@@ -33,6 +33,14 @@ public:
 		}
 	}
 
+	void DrawInstanced(Shader& shader, int amount)
+	{
+		for (unsigned int i = 0; i < meshes.size(); i++)
+		{
+			meshes[i].DrawInstanced(shader, amount);
+		}
+	}
+
 	std::vector<Mesh>& getMeshes()
 	{
 		return meshes;
