@@ -170,15 +170,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\imgui\imgui.cpp" />
+    <ClCompile Include="src\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\imgui\imgui_stdlib.cpp" />
+    <ClCompile Include="src\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\utility\App.cpp" />
+    <ClCompile Include="src\utility\Camera.cpp" />
     <ClCompile Include="src\utility\glad.c" />
-    <ClCompile Include="src\utility\stb_image.cpp" />
+    <ClCompile Include="src\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\utility\App.hpp" />
     <ClInclude Include="src\utility\Camera.hpp" />
     <ClInclude Include="src\utility\Light.hpp" />
     <ClInclude Include="src\utility\Mesh.hpp" />
     <ClInclude Include="src\utility\Model.hpp" />
+    <ClInclude Include="src\utility\Render.h" />
     <ClInclude Include="src\utility\Shader.hpp" />
+    <ClInclude Include="src\utility\Textures.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\base\base.frag" />
