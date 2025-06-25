@@ -182,6 +182,11 @@
     <ClCompile Include="src\utility\Camera.cpp" />
     <ClCompile Include="src\utility\glad.c" />
     <ClCompile Include="src\stb_image\stb_image.cpp" />
+    <ClCompile Include="src\utility\Mesh.cpp" />
+    <ClCompile Include="src\utility\Model.cpp" />
+    <ClCompile Include="src\utility\Render.cpp" />
+    <ClCompile Include="src\utility\Shader.cpp" />
+    <ClCompile Include="src\utility\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\utility\App.hpp" />
@@ -189,9 +194,9 @@
     <ClInclude Include="src\utility\Light.hpp" />
     <ClInclude Include="src\utility\Mesh.hpp" />
     <ClInclude Include="src\utility\Model.hpp" />
-    <ClInclude Include="src\utility\Render.h" />
+    <ClInclude Include="src\utility\Render.hpp" />
     <ClInclude Include="src\utility\Shader.hpp" />
-    <ClInclude Include="src\utility\Textures.h" />
+    <ClInclude Include="src\utility\Texture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\base\base.frag" />

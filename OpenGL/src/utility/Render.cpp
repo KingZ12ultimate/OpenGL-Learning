@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -9,8 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Model.hpp"
-
+#include "Mesh.hpp"
+#include "Render.hpp"
 
 unsigned int cubeVBO, planeVBO, quadVBO, skyboxVBO;
 unsigned int cubeVAO, planeVAO, quadVAO, skyboxVAO;
@@ -75,7 +73,6 @@ void renderCube()
     glBindVertexArray(0);
 }
 
-unsigned int planeVBO, planeVAO;
 void setupPlane()
 {
     if (planeVAO != 0)
@@ -156,7 +153,6 @@ void setupMesh(float data[], int dataSize, unsigned int& VAO, unsigned int& VBO)
     glBindVertexArray(0);
 }
 
-
 void renderPlane()
 {
     glBindVertexArray(planeVAO);
@@ -164,7 +160,6 @@ void renderPlane()
     glBindVertexArray(0);
 }
 
-unsigned int quadVBO, quadVAO;
 void renderQuad()
 {
     if (quadVAO == 0)
@@ -196,7 +191,6 @@ void renderQuad()
     glBindVertexArray(0);
 }
 
-unsigned int skyboxVAO, skyboxVBO;
 void renderSkybox()
 {
     if (skyboxVAO == 0)

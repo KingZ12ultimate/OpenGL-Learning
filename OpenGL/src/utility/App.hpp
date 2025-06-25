@@ -35,15 +35,3 @@ namespace App
     void mouse_callback(GLFWwindow* window, double xPos, double yPos);
     void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
 }
-
-//struct App
-//{
-//	GLFWwindow* window = nullptr;
-//	bool firstMouse = true;
-//	float lastX = 0.0f, lastY = 0.0f;
-//	unsigned int SCREEN_WIDTH = 1080, SCREEN_HEIGHT = 720;
-//
-//	// Initializes GLFW, OpenGL (using GLAD) and ImGUI, and returns a pointer to an App instance if one hasn't been created yet.
-//	App(unsigned int screenWidth = 1080, unsigned int screenHeight = 1080, const char* title = "LearnOpenGL");	
-//	~App();
-//};

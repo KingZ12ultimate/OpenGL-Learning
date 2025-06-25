@@ -1,9 +1,4 @@
-#pragma once
-
-#include <iostream>
-#include <glad/glad.h>
-#include <vector>
-#include "stb_image.h"
+#include "Texture.hpp"
 
 unsigned int loadTexture(char const* path, bool repeat, bool gamma)
 {
@@ -103,5 +98,14 @@ unsigned int loadCubeMap(std::vector<std::string> faces)
 
     stbi_set_flip_vertically_on_load(true);
 
+    return textureID;
+}
+
+unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma)
+{
+    std::string fileName = std::string(path);
+    fileName = directory + '/' + fileName;
+
+    unsigned int textureID = loadTexture(fileName.c_str(), true, gamma);
     return textureID;
 }

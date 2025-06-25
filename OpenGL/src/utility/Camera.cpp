@@ -1,3 +1,4 @@
+#include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"
 
 Camera::Camera(glm::vec3 cameraPos, glm::vec3 eulerAngles, float fov, float near, float far)
