@@ -10,8 +10,8 @@
 #include "Mesh.hpp"
 #include "Render.hpp"
 
-unsigned int cubeVBO, planeVBO, quadVBO, skyboxVBO;
-unsigned int cubeVAO, planeVAO, quadVAO, skyboxVAO;
+unsigned int cubeVBO, planeVBO, quadVBO, skyboxVBO, grassVBO;
+unsigned int cubeVAO, planeVAO, quadVAO, skyboxVAO, grassVAO;
 
 void setupCube()
 {
@@ -160,6 +160,38 @@ void renderPlane()
     glBindVertexArray(0);
 }
 
+void renderGrass()
+{
+    if (grassVAO == 0)
+    {
+        float grassVertices[] = {
+            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
+            0.0f, -0.5f,  0.0f,  0.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  0.0f,
+
+            0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  0.0f,
+            1.0f,  0.5f,  0.0f,  1.0f,  1.0f
+        };
+        // grass VAO
+        glGenVertexArrays(1, &grassVAO);
+        glGenBuffers(1, &grassVBO);
+        glBindVertexArray(grassVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(grassVertices), &grassVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glBindVertexArray(0);
+    }
+
+    glBindVertexArray(grassVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+}
+
 void renderQuad()
 {
     if (quadVAO == 0)
@@ -252,30 +284,4 @@ void renderSkybox()
     glBindVertexArray(skyboxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-}
-
-void renderScene(const Shader& shader)
-{
-    // floor
-    glm::mat4 model = glm::mat4(1.0f);
-    shader.setBool("white", 0);
-    shader.setMat4("model", model);
-    renderPlane();
-    // cubes
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 3.0f, 1.0));
-    model = glm::scale(model, glm::vec3(0.75f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.5f, 1.0f, 1.5));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.5f, 2.0f, -3.0));
-    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    model = glm::scale(model, glm::vec3(0.75f));
-    shader.setMat4("model", model);
-    renderCube();
 }

@@ -21,7 +21,9 @@ namespace App
     extern GLFWwindow* window;
     extern bool firstMouse;
     extern bool initialized;
+    extern bool cursor, cursorKeyPressed;
     extern float lastX, lastY;
+    extern float currentFrame, deltaTime;
     extern unsigned int SCREEN_WIDTH, SCREEN_HEIGHT;
     extern float near, far;
     extern Camera camera;
@@ -29,6 +31,8 @@ namespace App
 
     void Initialize(unsigned int screenWidth = 1080, unsigned int screenHeight = 1080, const char* title = "LearnOpenGL");
     void Clean();
+    void UpdateMouseStatus();
+    void UpdateTime();
 
     void glfw_error_callback(int error, const char* description);
     void framebuffer_size_callback(GLFWwindow* window, int width, int height);

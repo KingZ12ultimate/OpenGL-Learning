@@ -21,7 +21,6 @@ void renderCube();
 void setupPlane();
 void renderPlane();
 
+void renderGrass();
 void renderQuad();
 void renderSkybox();
-
-void renderScene(const Shader& shader);

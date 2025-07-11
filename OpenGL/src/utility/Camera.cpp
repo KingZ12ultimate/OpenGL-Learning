@@ -98,3 +98,8 @@ void Camera::processMouseScroll(float yOffset)
 	else if (fov < minFov)
 		fov = minFov;
 }
+
+void Camera::setSpeed(float speed)
+{
+	speed = fabsf(speed);
+}

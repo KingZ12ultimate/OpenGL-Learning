@@ -1,4 +1,5 @@
 #include "App.hpp"
+#include "Render.hpp"
 #include "stb_image.h"
 
 namespace App
@@ -6,7 +7,9 @@ namespace App
     GLFWwindow* window = nullptr;
     bool firstMouse = true;
     bool initialized = false;
+    bool cursor = false, cursorKeyPressed = false;
     float lastX = 0.0f, lastY = 0.0f;
+    float currentFrame = 0.0f, deltaTime = 0.0f;
     unsigned int SCREEN_WIDTH = 1080, SCREEN_HEIGHT = 720;
     float near = 0.1f, far = 1000.0f;
     Camera camera(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f), 45.0f, near, far);
@@ -57,7 +60,7 @@ namespace App
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
-        // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // setup Dear ImGui
         IMGUI_CHECKVERSION();
@@ -100,6 +103,9 @@ namespace App
         }
 
         stbi_set_flip_vertically_on_load(true);
+
+        setupCube();
+        setupPlane();
         #pragma endregion
     }
 
@@ -111,6 +117,45 @@ namespace App
 
         glfwDestroyWindow(window);
         glfwTerminate();
+    }
+
+    void UpdateMouseStatus()
+    {
+        static bool prevCursor = cursor;
+        
+        // Manual toggle with 'P'
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !cursorKeyPressed)
+        {
+            cursorKeyPressed = true;
+            cursor = true;
+        }
+        else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE)
+        {
+            cursorKeyPressed = false;
+        }
+
+        // Auto-capture: If cursor is enabled and user clicks outside any ImGui window, capture it again
+        if (cursor && ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+            !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+        {
+            cursor = false;
+        }
+
+        if (prevCursor && !cursor)
+        {
+            firstMouse = true;
+        }
+        prevCursor = cursor;
+        
+        glfwSetInputMode(window, GLFW_CURSOR, cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+    }
+
+    void UpdateTime()
+    {
+        static float lastFrame = 0.0f;
+        currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
     }
 
     void glfw_error_callback(int error, const char* description)

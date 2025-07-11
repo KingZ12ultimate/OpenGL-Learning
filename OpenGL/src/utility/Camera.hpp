@@ -26,6 +26,7 @@ public:
 	void processKeyPresses(GLFWwindow* window, float deltaTime);
 	void processMouseMovement(float xOffset, float yOffset);
 	void processMouseScroll(float yOffset);
+	void setSpeed(float speed);
 
 private:
 	float minFov = 1.0f;
@@ -33,5 +34,5 @@ private:
 	float minPitch = -89.0f;
 	float maxPitch = 89.0f;
 	float sensitivity = 0.1f;
-	const float speed = 10.0f;
+	float speed = 10.0f;
 };

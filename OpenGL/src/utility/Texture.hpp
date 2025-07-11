@@ -12,6 +12,6 @@ namespace TextureType {
     // Add more as needed
 }
 
-unsigned int loadTexture(char const* path, bool repeat, bool gamma);
+unsigned int loadTexture(char const* path, bool repeat, bool gamma = false);
 unsigned int loadCubeMap(std::vector<std::string> faces);
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
