@@ -66,7 +66,7 @@
     <ClCompile Include="src\utility\Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\SSAO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,5 +134,7 @@
     <None Include="resources\shaders\deferred\lighting_pass.frag" />
     <None Include="resources\shaders\instancing\light_cube_instanced.vert" />
     <None Include="resources\shaders\instancing\light_cube_instanced.frag" />
+    <None Include="resources\shaders\ssao\geometry_pass.frag" />
+    <None Include="resources\shaders\ssao\geometry_pass.vert" />
   </ItemGroup>
 </Project>

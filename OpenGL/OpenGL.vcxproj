@@ -169,7 +169,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
@@ -178,6 +177,7 @@
     <ClCompile Include="src\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\SSAO.cpp" />
     <ClCompile Include="src\utility\App.cpp" />
     <ClCompile Include="src\utility\Camera.cpp" />
     <ClCompile Include="src\utility\glad.c" />
@@ -236,6 +236,8 @@
     <None Include="resources\shaders\point_shadows\point_shadows_depth.vert" />
     <None Include="resources\shaders\skybox\skybox.frag" />
     <None Include="resources\shaders\skybox\skybox.vert" />
+    <None Include="resources\shaders\ssao\geometry_pass.frag" />
+    <None Include="resources\shaders\ssao\geometry_pass.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
