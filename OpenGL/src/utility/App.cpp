@@ -41,8 +41,8 @@ namespace App
         }
 
         const char* glslVersion = "#version 460";
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 
@@ -56,7 +56,7 @@ namespace App
             return;
         }
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
@@ -135,8 +135,7 @@ namespace App
         }
 
         // Auto-capture: If cursor is enabled and user clicks outside any ImGui window, capture it again
-        if (cursor && ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-            !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+        if (cursor && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !io->WantCaptureMouse)
         {
             cursor = false;
         }
@@ -171,7 +170,7 @@ namespace App
 
     void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
     {
-        if (io->WantCaptureMouse) return;
+        if (io->WantCaptureMouse || cursor) return;
 
         float xPos = static_cast<float>(xPosIn);
         float yPos = static_cast<float>(yPosIn);

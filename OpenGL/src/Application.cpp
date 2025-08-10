@@ -1,7 +1,9 @@
 #include <iostream>
 
 #include "utility/App.hpp"
+#include "utility/ComputeShader.hpp"
 #include "utility/Shader.hpp"
+#include "utility/Render.hpp"
 
 
 #ifdef __cplusplus
@@ -23,24 +25,47 @@ void printVec(glm::vec3& v)
 
 void processInput(GLFWwindow* window);
 
-void renderScene(const Shader& shader);
-
-glm::vec3 clearColor(0.0f);
-
 int main(void)
 {
-	App::Initialize(1920, 1920);
+    App::Initialize(1024, 1024);
 
-    // glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    
+
+    /*int data[6];
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &data[0]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &data[1]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &data[2]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &data[3]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &data[4]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &data[5]);
+
+    std::cout << "Group count: " << data[0] << ", " << data[1] << ", " << data[2] << std::endl;
+    std::cout << "Group size: " << data[3] << ", " << data[4] << ", " << data[5] << std::endl;*/
+
+    ComputeShader computeShader("resources/shaders/compute/beginner.comp");
+    Shader quadShader("resources/shaders/base/quad.vert", "resources/shaders/base/quad.frag");
+
+    const unsigned int TEXTURE_SIZE = 1024;
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+    quadShader.use();
+    quadShader.setInt("screenTexture", 0);
+
     while (!glfwWindowShouldClose(App::window))
     {
         App::UpdateTime();
         App::UpdateMouseStatus();
 
-        glfwPollEvents();
         processInput(App::window);
 
         if (glfwGetWindowAttrib(App::window, GLFW_ICONIFIED) != 0)
@@ -49,48 +74,50 @@ int main(void)
             continue;
         }
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        static float f = 0.0f;
-        static int counter = 0;
-
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-        ImGui::Text("Press \"P\" to toggle cursor.");               // Display some text (you can use a format strings too)
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", glm::value_ptr(clearColor)); // Edit 3 floats representing a color
-        
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / App::io->Framerate, App::io->Framerate);
-        ImGui::End();
-
-        ImGui::Render();
-        int displayW, displayH;
-        glfwGetFramebufferSize(App::window, &displayW, &displayH);
-        glViewport(0, 0, displayW, displayH);
-        glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
+        glViewport(0, 0, App::SCREEN_WIDTH, App::SCREEN_HEIGHT);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        static float speed = 1.0f;
+        computeShader.Use();
+        computeShader.SetFloat("t", App::currentFrame);
+        computeShader.SetFloat("speed", speed);
+        glDispatchCompute(TEXTURE_SIZE / 32, TEXTURE_SIZE / 32, 1);
 
-        // Update and Render additional Platform Windows
-        if (App::io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        quadShader.use();
+        renderQuad();
+
+        if (App::cursor)
         {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            ImGui::Begin("Hello, world!");
+            ImGui::Text("Press \"P\" to toggle cursor.");
+            ImGui::SliderFloat("Speed", &speed, 0.0f, 4.0f);
+            ImGui::Text("Current FPS is: %.1f (as measured by ImGui).", App::io->Framerate);
+            ImGui::End();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            // Update and Render additional Platform Windows
+            if (App::io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            {
+                GLFWwindow* backup_current_context = glfwGetCurrentContext();
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+                glfwMakeContextCurrent(backup_current_context);
+            }
         }
 
         glfwSwapBuffers(App::window);
+        glfwPollEvents();
     }
 
     App::Clean();

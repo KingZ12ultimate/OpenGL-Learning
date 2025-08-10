@@ -14,12 +14,12 @@ struct Material {
 	sampler2D texture_specular[1];
 };
 uniform Material material;
+uniform bool hasMaterial;
 
-// NOTE: all lighting variables are and should be in world-space
 void main()
 {
 	gPosition = fs_in.FragPos;
 	gNormal = normalize(fs_in.Normal);
-	gAlbedoSpec.rgb = texture(material.texture_diffuse[0], fs_in.TexCoords).rgb;
-	gAlbedoSpec.a = texture(material.texture_specular[0], fs_in.TexCoords).r;
+	gAlbedoSpec.rgb = hasMaterial ? texture(material.texture_diffuse[0], fs_in.TexCoords).rgb : vec3(0.95);
+	gAlbedoSpec.a = hasMaterial ? texture(material.texture_specular[0], fs_in.TexCoords).r : 1.0;
 }

@@ -169,6 +169,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Source.cpp" />
+    <ClCompile Include="src\utility\ComputeShader.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
@@ -177,7 +180,6 @@
     <ClCompile Include="src\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\SSAO.cpp" />
     <ClCompile Include="src\utility\App.cpp" />
     <ClCompile Include="src\utility\Camera.cpp" />
     <ClCompile Include="src\utility\glad.c" />
@@ -189,6 +191,7 @@
     <ClCompile Include="src\utility\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\utility\ComputeShader.hpp" />
     <ClInclude Include="src\utility\App.hpp" />
     <ClInclude Include="src\utility\Camera.hpp" />
     <ClInclude Include="src\utility\Light.hpp" />
@@ -210,6 +213,8 @@
     <None Include="resources\shaders\bloom\blur.frag" />
     <None Include="resources\shaders\bloom\lighting_with_bloom.frag" />
     <None Include="resources\shaders\bloom\lighting_with_bloom.vert" />
+    <None Include="resources\shaders\compute\beginner.comp" />
+    <None Include="resources\shaders\compute\sort.comp" />
     <None Include="resources\shaders\deferred\geometry_pass.frag" />
     <None Include="resources\shaders\deferred\geometry_pass.vert" />
     <None Include="resources\shaders\deferred\lighting_pass.frag" />
@@ -238,6 +243,9 @@
     <None Include="resources\shaders\skybox\skybox.vert" />
     <None Include="resources\shaders\ssao\geometry_pass.frag" />
     <None Include="resources\shaders\ssao\geometry_pass.vert" />
+    <None Include="resources\shaders\ssao\lighting_pass.frag" />
+    <None Include="resources\shaders\ssao\ssao_blur_pass.frag" />
+    <None Include="resources\shaders\ssao\ssao_pass.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

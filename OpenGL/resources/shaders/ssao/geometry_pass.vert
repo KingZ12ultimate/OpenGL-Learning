@@ -2,7 +2,6 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
-layout (location = 3) in mat4 instancedModelMatrix;
 
 out VS_OUT {
 	vec2 TexCoords;
@@ -13,12 +12,17 @@ out VS_OUT {
 layout(std140, binding = 0) uniform Matrices {
 	mat4 projection;
 	mat4 view;
+	mat4 model;
 };
+
+uniform bool invertNormals = false;
 
 void main()
 {
-	vs_out.FragPos = vec3(instancedModelMatrix * vec4(aPos, 1.0));
-	vs_out.Normal = transpose(inverse(mat3(instancedModelMatrix))) * aNormal;
+	float s = invertNormals ? -1.0 : 1.0;
+	vec4 viewPos = view * model * vec4(aPos, 1.0);
+	vs_out.FragPos = viewPos.xyz;
+	vs_out.Normal = transpose(inverse(mat3(view * model))) * (s * aNormal);
 	vs_out.TexCoords = aTexCoords;
-	gl_Position = projection * view * instancedModelMatrix * vec4(aPos, 1.0);
+	gl_Position = projection * viewPos;
 }

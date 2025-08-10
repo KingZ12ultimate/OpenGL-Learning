@@ -66,7 +66,13 @@
     <ClCompile Include="src\utility\Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SSAO.cpp">
+    <ClCompile Include="src\utility\ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -93,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utility\Render.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utility\ComputeShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -136,5 +145,10 @@
     <None Include="resources\shaders\instancing\light_cube_instanced.frag" />
     <None Include="resources\shaders\ssao\geometry_pass.frag" />
     <None Include="resources\shaders\ssao\geometry_pass.vert" />
+    <None Include="resources\shaders\ssao\ssao_pass.frag" />
+    <None Include="resources\shaders\ssao\ssao_blur_pass.frag" />
+    <None Include="resources\shaders\ssao\lighting_pass.frag" />
+    <None Include="resources\shaders\compute\beginner.comp" />
+    <None Include="resources\shaders\compute\sort.comp" />
   </ItemGroup>
 </Project>

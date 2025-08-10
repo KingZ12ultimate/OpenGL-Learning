@@ -143,7 +143,7 @@ int main(void)
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 
-        float a = 0.5f * sinf(currentFrame) + 0.5f;
+        float a = 0.5f * sinf(App::currentFrame) + 0.5f;
         lightPos.y = glm::mix(0.2f, 1.0f, a);
         glm::vec3 lightColor = 5.0f * glm::vec3(0.53f, 0.96, 1.0f);
 
@@ -195,7 +195,7 @@ int main(void)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        a = 0.5 * sinf(0.4f * currentFrame) + 0.5f;
+        a = 0.5 * sinf(0.4f * App::currentFrame) + 0.5f;
         float exposure = glm::mix(0.1f, 5.0f, a);
 
         bloomShader.use();
@@ -245,5 +245,5 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    App::camera.processKeyPresses(window, deltaTime);
+    App::camera.processKeyPresses(window, App::deltaTime);
 }

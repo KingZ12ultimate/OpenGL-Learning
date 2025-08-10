@@ -1,5 +1,6 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 
 class Shader
@@ -54,4 +55,3 @@ public:
 	// set uniform mat4
 	void setMat4(const std::string& name, glm::mat4 matrix) const;
 };
-#endif
